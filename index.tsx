@@ -1,7 +1,9 @@
 import React, { Component } from "react";
 import { render } from "react-dom";
-import Hello from "./Hello";
 import "./style.css";
+import {Provider} from "react-redux"
+import { RxjsViewLayer } from "./view-rxjs";
+import { ReduxViewLayer } from "./view-redux";
 
 function App() {
   const [mode, setMode] = React.useState("rxjs" as "rxjs" | "redux");
@@ -16,21 +18,12 @@ function App() {
         <option value="rxjs">rxjs</option>
         <option value="redux">redux</option>
       </select>
-      <p>Start editing to see some magic happen :)</p>
+      {
+        mode === 'rxjs' ? <RxjsViewLayer /> : <ReduxViewLayer />
+      }
     </div>
   );
 }
 
-function RxjsContainer(){
-
-}
-
-function ReduxContainer(){
-  return <Provider>
-    {
-      
-    }
-  </Provider>
-}
 
 render(<App />, document.getElementById("root"));

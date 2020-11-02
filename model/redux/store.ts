@@ -12,11 +12,26 @@ export enum ActionType {
   ResetCounter = "resetCounter"
 }
 
+export const ActionCreators = {
+  [ActionType.AddCounter](right: number) {
+    return {
+      type: ActionType.AddCounter,
+      payload: { right }
+    };
+  },
+  [ActionType.SubCounter](right: number) {
+    return {
+      type: ActionType.SubCounter,
+      payload: { right }
+    };
+  }
+};
+
 const initialRootState = {
   counter: 1
 };
 
-type RootState = typeof initialRootState;
+export type RootState = typeof initialRootState;
 
 const reducers = {
   [ActionType.AddCounter](state: RootState, action: Action<{ right: number }>) {
@@ -38,5 +53,9 @@ for (const k in reducers) {
 }
 
 export const store = createStore(function rootReducer(state, action) {
-  return reducers[action.type](state, action);
+  if (action.type in reducers) {
+    return reducers[action.type](state, action);
+  } else {
+    return state;
+  }
 }, initialRootState);
