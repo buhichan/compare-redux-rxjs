@@ -1,5 +1,8 @@
-import { createStore } from "redux";
+import { createStore, applyMiddleware } from "redux";
+import { default as createSagaMiddleware, } from "redux-saga"
 import { produce } from "immer";
+import { takeLatest, put } from "redux-saga/effects"
+import { api, IFilm } from "../../api/mock";
 
 type Action<P = unknown> = {
   type: ActionType;
@@ -9,10 +12,25 @@ type Action<P = unknown> = {
 export enum ActionType {
   AddCounter = "addCounter",
   SubCounter = "subCounter",
-  ResetCounter = "resetCounter"
+  ResetCounter = "resetCounter",
+  SetFilms = "setFilms",
+  LoadFilms = "loadFilms",
 }
 
 export const ActionCreators = {
+  [ActionType.LoadFilms](){
+    return {
+      type: ActionType.LoadFilms,
+    }
+  },
+  [ActionType.SetFilms](films: IFilm[]){
+    return {
+      type: ActionType.SetFilms,
+      payload:{
+        films,
+      }
+    }
+  },
   [ActionType.AddCounter](right: number) {
     return {
       type: ActionType.AddCounter,
@@ -28,7 +46,8 @@ export const ActionCreators = {
 };
 
 const initialRootState = {
-  counter: 1
+  counter: 1,
+  films: [] as IFilm[]
 };
 
 export type RootState = typeof initialRootState;
@@ -45,12 +64,17 @@ const reducers = {
     action: Action<{ right: number }>
   ) {
     state.counter = initialRootState.counter;
-  }
+  },
+  [ActionType.SetFilms](state: RootState, action: Action<{ films: IFilm[] }>) {
+    state.films = action.payload.films
+  },
 };
 
 for (const k in reducers) {
   reducers[k] = produce(reducers[k]);
 }
+
+const sagaMiddleware = createSagaMiddleware()
 
 export const store = createStore(function rootReducer(state, action) {
   if (action.type in reducers) {
@@ -58,4 +82,15 @@ export const store = createStore(function rootReducer(state, action) {
   } else {
     return state;
   }
-}, initialRootState);
+}, initialRootState, applyMiddleware(
+  sagaMiddleware
+));
+
+function* loadFilms(){
+  const films = yield api.getFilms()
+  yield put(ActionCreators[ActionType.SetFilms](films))
+}
+
+sagaMiddleware.run(function* sagaRoot(){
+   yield takeLatest(ActionType.LoadFilms, loadFilms)
+})
