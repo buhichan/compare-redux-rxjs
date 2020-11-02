@@ -14,11 +14,9 @@ export const api = {
 }
 
 export const apiRx = {
-  getFilms(){
-    return fromFetch("https://swapi.dev/api/films/")
+  getFilms: fromFetch("https://swapi.dev/api/films/")
     .pipe(
       switchMap((x=>x.json() as Promise<{results: IFilm[]}>)),
       map(x=>x.results),
     )
-  }
 }
