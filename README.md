@@ -4,4 +4,4 @@
 
 StackBlitz sucks.
 
-[CodeSandbox] (https://codesandbox.io/s/crazy-sinoussi-dei1b)
+[CodeSandbox](https://codesandbox.io/s/crazy-sinoussi-dei1b)
